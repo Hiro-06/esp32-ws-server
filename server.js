@@ -41,7 +41,7 @@ app.get("/", (_req, res) => {
   </style>
 </head>
 <body>
-  <h1>ESP32 Live (1s update)</h1>
+  <h1>OIT TEAM REGALIA ミル子</h1>
   <div class="row">
     <div class="card">
       <div class="muted">Status</div>
