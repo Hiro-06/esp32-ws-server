@@ -27,39 +27,34 @@ wss.on("connection", (ws) => {
    unit : 単位（空文字可）
 */
 const FIELDS = [
-  // 時間
+  // 現ラップ
   { key: "ntime",  label: "現ラップタイム",        unit: "" },
-  { key: "otime",  label: "前ラップタイム",        unit: "" },
-  { key: "ttime",  label: "トータルタイム",      unit: "" },
-
-  // 走行
   { key: "kmph",   label: "速度",           unit: "km/h" },
-
-  // 電圧・電流
   { key: "v",      label: "主幹電圧",     unit: "V" },
   { key: "im",     label: "モータ電流",   unit: "A" },
   { key: "ipv",    label: "PV電流",      unit: "A" },
   { key: "ib",     label: "バッテリ電流", unit: "A" },
-
-  // 瞬時電力
   { key: "pm",     label: "モータ電力",     unit: "W" },
   { key: "ppv",    label: "PV電力",        unit: "W" },
   { key: "pb",     label: "バッテリ電力",   unit: "W" },
-
-  // ラップ積算
   { key: "pim",    label: "現ラップモータ電力量",   unit: "Wh" },
   { key: "pipv",   label: "現ラップPV電力量",      unit: "Wh" },
   { key: "pib",    label: "現ラップバッテリ電力量", unit: "Wh" },
 
   // 前ラップ
+  
+  { key: "otime",  label: "前ラップタイム",        unit: "" },
   { key: "pimo",   label: "前ラップモータ電力量",  unit: "Wh" },
   { key: "pipvo",  label: "前ラップPV電力量",     unit: "Wh" },
   { key: "pibo",   label: "前ラップバッテリ電力量",unit: "Wh" },
-
-  // 総積算
+  
+  // トータル
+  
+  { key: "ttime",  label: "トータルタイム",      unit: "" },
   { key: "pimt",   label: "トータルモータ電力量", unit: "Wh" },
   { key: "pipvt",  label: "トータルPV電力量",    unit: "Wh" },
   { key: "pibt",   label: "トータルバッテリ電力量",unit: "Wh" },
+  
 ];
 
 app.get("/", (_req, res) => {
