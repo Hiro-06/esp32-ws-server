@@ -9,8 +9,6 @@ const server = http.createServer(app);
 // ===== WebSocket =====
 const wss = new WebSocket.Server({ server, path: "/ws" });
 
-let lastJson = {}; // 最新データ（初期表示用）
-
 function broadcast(data) {
   for (const c of wss.clients) {
     if (c.readyState === WebSocket.OPEN) c.send(data);
@@ -19,31 +17,49 @@ function broadcast(data) {
 
 wss.on("connection", (ws) => {
   ws.on("message", (msg) => {
-    const s = msg.toString();
-    try { lastJson = JSON.parse(s); } catch {}
-    broadcast(s);
+    broadcast(msg.toString());
   });
 });
 
-// ===== 固定表示したいキー順 =====
-const FIXED_KEYS = [
-  // 時間系
-  "ntime", "otime", "ttime",
+/* ===== 表示定義（ここを編集するだけ）=====
+   key : ESP32から来るJSONキー
+   label : 表示名
+   unit : 単位（空文字可）
+*/
+const FIELDS = [
+  // 時間
+  { key: "ntime",  label: "Lap Time",        unit: "" },
+  { key: "otime",  label: "Prev Lap",        unit: "" },
+  { key: "ttime",  label: "Total Time",      unit: "" },
 
-  // 速度・電圧・電流
-  "kmph", "v", "im", "ipv", "ib",
+  // 走行
+  { key: "kmph",   label: "Speed",           unit: "km/h" },
+
+  // 電圧・電流
+  { key: "v",      label: "Bus Voltage",     unit: "V" },
+  { key: "im",     label: "Motor Current",   unit: "A" },
+  { key: "ipv",    label: "PV Current",      unit: "A" },
+  { key: "ib",     label: "Battery Current", unit: "A" },
 
   // 瞬時電力
-  "pm", "ppv", "pb",
+  { key: "pm",     label: "Motor Power",     unit: "W" },
+  { key: "ppv",    label: "PV Power",        unit: "W" },
+  { key: "pb",     label: "Battery Power",   unit: "W" },
 
   // ラップ積算
-  "pim", "pipv", "pib",
+  { key: "pim",    label: "Motor Energy (Lap)",   unit: "Wh" },
+  { key: "pipv",   label: "PV Energy (Lap)",      unit: "Wh" },
+  { key: "pib",    label: "Battery Energy (Lap)", unit: "Wh" },
 
   // 前ラップ
-  "pimo", "pipvo", "pibo",
+  { key: "pimo",   label: "Motor Energy (Prev)",  unit: "Wh" },
+  { key: "pipvo",  label: "PV Energy (Prev)",     unit: "Wh" },
+  { key: "pibo",   label: "Battery Energy (Prev)",unit: "Wh" },
 
   // 総積算
-  "pimt", "pipvt", "pibt"
+  { key: "pimt",   label: "Motor Energy (Total)", unit: "Wh" },
+  { key: "pipvt",  label: "PV Energy (Total)",    unit: "Wh" },
+  { key: "pibt",   label: "Battery Energy (Total)",unit: "Wh" },
 ];
 
 app.get("/", (_req, res) => {
@@ -60,7 +76,8 @@ app.get("/", (_req, res) => {
     margin: 24px;
     background: #fafafa;
   }
-  h1 { margin-bottom: 8px; }
+  h1 { margin-bottom: 6px; }
+
   .status {
     margin-bottom: 16px;
     font-weight: 700;
@@ -70,58 +87,83 @@ app.get("/", (_req, res) => {
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 14px;
   }
+
   .card {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 14px;
     padding: 14px 16px;
   }
-  .key {
+
+  .label {
     font-size: 13px;
     color: #666;
   }
-  .val {
+
+  .value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .value {
     font-size: 30px;
     font-weight: 800;
-    margin-top: 6px;
+  }
+
+  .unit {
+    font-size: 16px;
+    font-weight: 700;
+    color: #555;
   }
 </style>
 </head>
 
 <body>
-<h1>OIT TEAM REGALIA 宮　ミル子</h1>
+<h1>OIT TEAM REGALIA　宮　ミル子</h1>
 <div id="status" class="status ng">WS: connecting…</div>
 
 <div id="grid" class="grid"></div>
 
 <script>
-  const FIXED_KEYS = ${JSON.stringify(FIXED_KEYS)};
+  const FIELDS = ${JSON.stringify(FIELDS)};
   const grid = document.getElementById("grid");
   const statusEl = document.getElementById("status");
 
-  const cards = {}; // key -> value element
+  const values = {}; // key -> span
 
   // ===== 固定カード生成 =====
-  FIXED_KEYS.forEach(k => {
+  FIELDS.forEach(f => {
     const card = document.createElement("div");
     card.className = "card";
 
-    const keyEl = document.createElement("div");
-    keyEl.className = "key";
-    keyEl.textContent = k;
+    const label = document.createElement("div");
+    label.className = "label";
+    label.textContent = f.label;
 
-    const valEl = document.createElement("div");
-    valEl.className = "val";
-    valEl.textContent = "—";
+    const row = document.createElement("div");
+    row.className = "value-row";
 
-    card.appendChild(keyEl);
-    card.appendChild(valEl);
+    const val = document.createElement("span");
+    val.className = "value";
+    val.textContent = "—";
+
+    const unit = document.createElement("span");
+    unit.className = "unit";
+    unit.textContent = f.unit;
+
+    row.appendChild(val);
+    if (f.unit) row.appendChild(unit);
+
+    card.appendChild(label);
+    card.appendChild(row);
     grid.appendChild(card);
 
-    cards[k] = valEl;
+    values[f.key] = val;
   });
 
   // ===== WebSocket =====
@@ -145,9 +187,9 @@ app.get("/", (_req, res) => {
     ws.onmessage = (ev) => {
       try {
         const obj = JSON.parse(ev.data);
-        for (const k of FIXED_KEYS) {
-          if (obj[k] !== undefined) {
-            cards[k].textContent = obj[k];
+        for (const f of FIELDS) {
+          if (obj[f.key] !== undefined) {
+            values[f.key].textContent = obj[f.key];
           }
         }
       } catch {}
