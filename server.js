@@ -52,7 +52,7 @@ app.get("/", (_req, res) => {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OIT TEAM REGALIA 宮　ミル子</title>
+<title>OIT TEAM REGALIA　宮　ミル子</title>
 
 <style>
   body {
