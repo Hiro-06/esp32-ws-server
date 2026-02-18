@@ -92,7 +92,7 @@ app.get("/", (_req, res) => {
 </head>
 
 <body>
-<h1>ESP32 Telemetry</h1>
+<h1>OIT TEAM REGALIA 宮　ミル子</h1>
 <div id="status" class="status ng">WS: connecting…</div>
 
 <div id="grid" class="grid"></div>
