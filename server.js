@@ -28,38 +28,38 @@ wss.on("connection", (ws) => {
 */
 const FIELDS = [
   // 時間
-  { key: "ntime",  label: "Lap Time",        unit: "" },
-  { key: "otime",  label: "Prev Lap",        unit: "" },
-  { key: "ttime",  label: "Total Time",      unit: "" },
+  { key: "ntime",  label: "現ラップタイム",        unit: "" },
+  { key: "otime",  label: "前ラップタイム",        unit: "" },
+  { key: "ttime",  label: "トータルタイム",      unit: "" },
 
   // 走行
-  { key: "kmph",   label: "Speed",           unit: "km/h" },
+  { key: "kmph",   label: "速度",           unit: "km/h" },
 
   // 電圧・電流
-  { key: "v",      label: "Bus Voltage",     unit: "V" },
-  { key: "im",     label: "Motor Current",   unit: "A" },
-  { key: "ipv",    label: "PV Current",      unit: "A" },
-  { key: "ib",     label: "Battery Current", unit: "A" },
+  { key: "v",      label: "主幹電圧",     unit: "V" },
+  { key: "im",     label: "モータ電流",   unit: "A" },
+  { key: "ipv",    label: "PV電流",      unit: "A" },
+  { key: "ib",     label: "バッテリ電流", unit: "A" },
 
   // 瞬時電力
-  { key: "pm",     label: "Motor Power",     unit: "W" },
-  { key: "ppv",    label: "PV Power",        unit: "W" },
-  { key: "pb",     label: "Battery Power",   unit: "W" },
+  { key: "pm",     label: "モータ電力",     unit: "W" },
+  { key: "ppv",    label: "PV電力",        unit: "W" },
+  { key: "pb",     label: "バッテリ電力",   unit: "W" },
 
   // ラップ積算
-  { key: "pim",    label: "Motor Energy (Lap)",   unit: "Wh" },
-  { key: "pipv",   label: "PV Energy (Lap)",      unit: "Wh" },
-  { key: "pib",    label: "Battery Energy (Lap)", unit: "Wh" },
+  { key: "pim",    label: "現ラップモータ電力量",   unit: "Wh" },
+  { key: "pipv",   label: "現ラップPV電力量",      unit: "Wh" },
+  { key: "pib",    label: "現ラップバッテリ電力量", unit: "Wh" },
 
   // 前ラップ
-  { key: "pimo",   label: "Motor Energy (Prev)",  unit: "Wh" },
-  { key: "pipvo",  label: "PV Energy (Prev)",     unit: "Wh" },
-  { key: "pibo",   label: "Battery Energy (Prev)",unit: "Wh" },
+  { key: "pimo",   label: "前ラップモータ電力量",  unit: "Wh" },
+  { key: "pipvo",  label: "前ラップPV電力量",     unit: "Wh" },
+  { key: "pibo",   label: "前ラップバッテリ電力量",unit: "Wh" },
 
   // 総積算
-  { key: "pimt",   label: "Motor Energy (Total)", unit: "Wh" },
-  { key: "pipvt",  label: "PV Energy (Total)",    unit: "Wh" },
-  { key: "pibt",   label: "Battery Energy (Total)",unit: "Wh" },
+  { key: "pimt",   label: "トータルモータ電力量", unit: "Wh" },
+  { key: "pipvt",  label: "トータルPV電力量",    unit: "Wh" },
+  { key: "pibt",   label: "トータルバッテリ電力量",unit: "Wh" },
 ];
 
 app.get("/", (_req, res) => {
