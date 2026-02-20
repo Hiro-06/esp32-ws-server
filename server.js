@@ -22,39 +22,37 @@ wss.on("connection", (ws) => {
 });
 
 /* ===== 表示定義（ここを編集するだけ）=====
-   key : ESP32から来るJSONキー
-   label : 表示名
+   group: グループ名（見出し）
+   key  : ESP32から来るJSONキー
+   label: 表示名
    unit : 単位（空文字可）
 */
 const FIELDS = [
-  // 現ラップ
-  { key: "ntime",  label: "現ラップタイム",        unit: "" },
-  { key: "kmph",   label: "速度",           unit: "km/h" },
-  { key: "v",      label: "主幹電圧",     unit: "V" },
-  { key: "im",     label: "モータ電流",   unit: "A" },
-  { key: "ipv",    label: "PV電流",      unit: "A" },
-  { key: "ib",     label: "バッテリ電流", unit: "A" },
-  { key: "pm",     label: "モータ電力",     unit: "W" },
-  { key: "ppv",    label: "PV電力",        unit: "W" },
-  { key: "pb",     label: "バッテリ電力",   unit: "W" },
-  { key: "pim",    label: "現ラップモータ電力量",   unit: "Wh" },
-  { key: "pipv",   label: "現ラップPV電力量",      unit: "Wh" },
-  { key: "pib",    label: "現ラップバッテリ電力量", unit: "Wh" },
+  // ===== 現ラップ =====
+  { group: "現ラップ", key: "ntime", label: "現ラップタイム", unit: "" },
+  { group: "現ラップ", key: "kmph",  label: "速度",           unit: "km/h" },
+  { group: "現ラップ", key: "v",     label: "主幹電圧",       unit: "V" },
+  { group: "現ラップ", key: "im",    label: "モータ電流",     unit: "A" },
+  { group: "現ラップ", key: "ipv",   label: "PV電流",         unit: "A" },
+  { group: "現ラップ", key: "ib",    label: "バッテリ電流",   unit: "A" },
+  { group: "現ラップ", key: "pm",    label: "モータ電力",     unit: "W" },
+  { group: "現ラップ", key: "ppv",   label: "PV電力",         unit: "W" },
+  { group: "現ラップ", key: "pb",    label: "バッテリ電力",   unit: "W" },
+  { group: "現ラップ", key: "pim",   label: "現ラップモータ電力量",     unit: "Wh" },
+  { group: "現ラップ", key: "pipv",  label: "現ラップPV電力量",          unit: "Wh" },
+  { group: "現ラップ", key: "pib",   label: "現ラップバッテリ電力量",   unit: "Wh" },
 
-  // 前ラップ
-  
-  { key: "otime",  label: "前ラップタイム",        unit: "" },
-  { key: "pimo",   label: "前ラップモータ電力量",  unit: "Wh" },
-  { key: "pipvo",  label: "前ラップPV電力量",     unit: "Wh" },
-  { key: "pibo",   label: "前ラップバッテリ電力量",unit: "Wh" },
-  
-  // トータル
-  
-  { key: "ttime",  label: "トータルタイム",      unit: "" },
-  { key: "pimt",   label: "トータルモータ電力量", unit: "Wh" },
-  { key: "pipvt",  label: "トータルPV電力量",    unit: "Wh" },
-  { key: "pibt",   label: "トータルバッテリ電力量",unit: "Wh" },
-  
+  // ===== 前ラップ =====
+  { group: "前ラップ", key: "otime", label: "前ラップタイム", unit: "" },
+  { group: "前ラップ", key: "pimo",  label: "前ラップモータ電力量",     unit: "Wh" },
+  { group: "前ラップ", key: "pipvo", label: "前ラップPV電力量",          unit: "Wh" },
+  { group: "前ラップ", key: "pibo",  label: "前ラップバッテリ電力量",   unit: "Wh" },
+
+  // ===== トータル =====
+  { group: "トータル", key: "ttime", label: "トータルタイム", unit: "" },
+  { group: "トータル", key: "pimt",  label: "トータルモータ電力量",     unit: "Wh" },
+  { group: "トータル", key: "pipvt", label: "トータルPV電力量",          unit: "Wh" },
+  { group: "トータル", key: "pibt",  label: "トータルバッテリ電力量",   unit: "Wh" },
 ];
 
 app.get("/", (_req, res) => {
@@ -75,7 +73,7 @@ app.get("/", (_req, res) => {
 
   .status {
     margin-bottom: 16px;
-    font-weight: 700;
+    font-weight: 800;
   }
   .ok { color: #0a7a32; }
   .ng { color: #b00020; }
@@ -85,6 +83,34 @@ app.get("/", (_req, res) => {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 14px;
   }
+
+  /* ===== セクション見出し（グループ名） ===== */
+  .group-title {
+    grid-column: 1 / -1;      /* 横いっぱい */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: .02em;
+    border: 1px solid #ddd;
+    background: #fff;
+  }
+  .group-title::before {
+    content: "";
+    width: 10px;
+    height: 18px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  /* グループ別カラー */
+  .g-now::before   { background: #2563eb; }  /* 青 */
+  .g-prev::before  { background: #f59e0b; }  /* オレンジ */
+  .g-total::before { background: #7c3aed; }  /* 紫 */
 
   .card {
     background: #fff;
@@ -107,14 +133,20 @@ app.get("/", (_req, res) => {
 
   .value {
     font-size: 30px;
-    font-weight: 800;
+    font-weight: 900;
+    color: #111;
   }
 
   .unit {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 800;
     color: #555;
   }
+
+  /* グループごとにカード枠も少し色を付ける（薄いアクセント） */
+  .card.now   { border-left: 6px solid #2563eb; }
+  .card.prev  { border-left: 6px solid #f59e0b; }
+  .card.total { border-left: 6px solid #7c3aed; }
 </style>
 </head>
 
@@ -131,10 +163,34 @@ app.get("/", (_req, res) => {
 
   const values = {}; // key -> span
 
-  // ===== 固定カード生成 =====
+  // group名 → CSSクラス
+  function groupClass(g) {
+    if (g === "現ラップ") return { title: "g-now", card: "now" };
+    if (g === "前ラップ") return { title: "g-prev", card: "prev" };
+    if (g === "トータル") return { title: "g-total", card: "total" };
+    return { title: "", card: "" };
+  }
+
+  // ===== 固定カード生成（グループ見出し付き） =====
+  let currentGroup = "";
+  let currentCardClass = "";
+
   FIELDS.forEach(f => {
+    // グループが変わったら見出しを追加
+    if (f.group !== currentGroup) {
+      currentGroup = f.group;
+      const cls = groupClass(currentGroup);
+
+      const title = document.createElement("div");
+      title.className = "group-title " + cls.title;
+      title.textContent = currentGroup;
+      grid.appendChild(title);
+
+      currentCardClass = cls.card;
+    }
+
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "card " + currentCardClass;
 
     const label = document.createElement("div");
     label.className = "label";
