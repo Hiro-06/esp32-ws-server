@@ -49,6 +49,7 @@ const FIELDS = [
   { group: "前ラップ", key: "pibo",  label: "前ラップバッテリ電力量",   unit: "Wh" },
 
   // ===== トータル =====
+  { group: "トータル", key: "lc", label: "ラップ数", unit: "" },
   { group: "トータル", key: "ttime", label: "トータルタイム", unit: "" },
   { group: "トータル", key: "pimt",  label: "トータルモータ電力量",     unit: "Wh" },
   { group: "トータル", key: "pipvt", label: "トータルPV電力量",          unit: "Wh" },
