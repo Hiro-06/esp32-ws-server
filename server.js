@@ -25,12 +25,14 @@ wss.on("connection", (ws) => {
 const FIELDS = [
   // ===== 瞬時データ =====
   { group: "瞬時データ", key: "ntime", label: "現ラップタイム", unit: "" },
-  { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h" },
-  { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V" },
+  { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h", important: true },
+  { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V", important: true },
+
   { group: "瞬時データ", key: "im", label: "モータ電流", unit: "A" },
   { group: "瞬時データ", key: "ipv", label: "PV電流", unit: "A" },
   { group: "瞬時データ", key: "ib", label: "バッテリ電流", unit: "A" },
-  { group: "瞬時データ", key: "pm", label: "モータ電力", unit: "W" },
+
+  { group: "瞬時データ", key: "pm", label: "モータ電力", unit: "W", important: true },
   { group: "瞬時データ", key: "ppv", label: "PV電力", unit: "W" },
   { group: "瞬時データ", key: "pb", label: "バッテリ電力", unit: "W" },
 
@@ -100,6 +102,13 @@ app.get("/", (_req, res) => {
     gap: 14px;
   }
 
+  .instant-grid {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
   .group-title {
     grid-column: 1 / -1;
     display: flex;
@@ -164,6 +173,12 @@ app.get("/", (_req, res) => {
     border-left: 7px solid #16a34a;
   }
 
+  .card.important {
+    background: #172554;
+    border: 2px solid #3b82f6;
+    border-left: 9px solid #60a5fa;
+  }
+
   .label {
     font-size: 14px;
     font-weight: 700;
@@ -190,16 +205,32 @@ app.get("/", (_req, res) => {
     color: #94a3b8;
   }
 
-  /* 瞬時データだけ少し大きく表示 */
   .card.now .value {
     font-size: 42px;
   }
 
-  .card.now .label {
-    font-size: 15px;
+  .card.important .value {
+    font-size: 54px;
   }
 
-  /* スマホ表示 */
+  .card.important .label {
+    font-size: 16px;
+  }
+
+  .card.important .unit {
+    font-size: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .instant-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .card.important .value {
+      font-size: 42px;
+    }
+  }
+
   @media (max-width: 600px) {
     body {
       margin: 12px;
@@ -214,12 +245,21 @@ app.get("/", (_req, res) => {
       gap: 10px;
     }
 
+    .instant-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
     .value {
       font-size: 28px;
     }
 
     .card.now .value {
       font-size: 34px;
+    }
+
+    .card.important .value {
+      font-size: 40px;
     }
   }
 </style>
@@ -236,8 +276,6 @@ app.get("/", (_req, res) => {
   const grid = document.getElementById("grid");
   const statusEl = document.getElementById("status");
 
-  // key -> span配列
-  // 同じkeyを複数箇所に表示するため配列にする
   const values = {};
 
   function groupClass(g) {
@@ -262,6 +300,7 @@ app.get("/", (_req, res) => {
 
   let currentGroup = "";
   let currentCardClass = "";
+  let instantContainer = null;
 
   FIELDS.forEach((f) => {
     if (f.group !== currentGroup) {
@@ -274,10 +313,21 @@ app.get("/", (_req, res) => {
       grid.appendChild(title);
 
       currentCardClass = cls.card;
+
+      if (currentGroup === "瞬時データ") {
+        instantContainer = document.createElement("div");
+        instantContainer.className = "instant-grid";
+        grid.appendChild(instantContainer);
+      }
     }
 
     const card = document.createElement("div");
-    card.className = "card " + currentCardClass;
+
+    if (f.important) {
+      card.className = "card " + currentCardClass + " important";
+    } else {
+      card.className = "card " + currentCardClass;
+    }
 
     const label = document.createElement("div");
     label.className = "label";
@@ -295,17 +345,24 @@ app.get("/", (_req, res) => {
     unit.textContent = f.unit;
 
     row.appendChild(val);
+
     if (f.unit) {
       row.appendChild(unit);
     }
 
     card.appendChild(label);
     card.appendChild(row);
-    grid.appendChild(card);
+
+    if (f.group === "瞬時データ") {
+      instantContainer.appendChild(card);
+    } else {
+      grid.appendChild(card);
+    }
 
     if (!values[f.key]) {
       values[f.key] = [];
     }
+
     values[f.key].push(val);
   });
 
