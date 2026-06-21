@@ -30,16 +30,16 @@ wss.on("connection", (ws) => {
 const FIELDS = [
   // ===== 瞬時データ =====
   { group: "瞬時データ", key: "ntime", label: "現ラップタイム", unit: "", type: "normal" },
-  { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h", type: "gauge", min: 0, max: 120 },
-  { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V", type: "gauge", min: 20, max: 36 },
+  { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h", type: "gauge", min: 0, max: 150 },
+  { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V", type: "gauge", min: 0, max: 130 },
 
   { group: "瞬時データ", key: "im", label: "モータ電流", unit: "A", type: "normal" },
   { group: "瞬時データ", key: "ipv", label: "PV電流", unit: "A", type: "normal" },
   { group: "瞬時データ", key: "ib", label: "バッテリ電流", unit: "A", type: "normal" },
 
-  { group: "瞬時データ", key: "pm", label: "モータ電力", unit: "W", type: "bar", min: 0, max: 1500 },
-  { group: "瞬時データ", key: "ppv", label: "PV電力", unit: "W", type: "bar", min: 0, max: 1200 },
-  { group: "瞬時データ", key: "pb", label: "バッテリ電力", unit: "W", type: "bar", min: -1000, max: 1000 },
+  { group: "瞬時データ", key: "pm", label: "モータ電力", unit: "W", type: "bar", min: -5000, max: 5000 },
+  { group: "瞬時データ", key: "ppv", label: "PV電力", unit: "W", type: "bar", min: 0, max: 2000 },
+  { group: "瞬時データ", key: "pb", label: "バッテリ電力", unit: "W", type: "bar", min: -5000, max: 5000 },
 
   // ===== 現ラップデータ =====
   { group: "現ラップデータ", key: "pim", label: "現ラップモータ電力量", unit: "Wh", type: "normal" },
