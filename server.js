@@ -25,19 +25,18 @@ wss.on("connection", (ws) => {
 const FIELDS = [
   // ===== 瞬時データ =====
   { group: "瞬時データ", key: "ntime", label: "現ラップタイム", unit: "" },
-  { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h", important: true },
-  { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V", important: true },
+  { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h" },
+  { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V" },
 
   { group: "瞬時データ", key: "im", label: "モータ電流", unit: "A" },
   { group: "瞬時データ", key: "ipv", label: "PV電流", unit: "A" },
   { group: "瞬時データ", key: "ib", label: "バッテリ電流", unit: "A" },
 
-  { group: "瞬時データ", key: "pm", label: "モータ電力", unit: "W", important: true },
+  { group: "瞬時データ", key: "pm", label: "モータ電力", unit: "W" },
   { group: "瞬時データ", key: "ppv", label: "PV電力", unit: "W" },
   { group: "瞬時データ", key: "pb", label: "バッテリ電力", unit: "W" },
 
   // ===== 現ラップデータ =====
-  { group: "現ラップデータ", key: "ntime", label: "現ラップタイム", unit: "" },
   { group: "現ラップデータ", key: "pim", label: "現ラップモータ電力量", unit: "Wh" },
   { group: "現ラップデータ", key: "pipv", label: "現ラップPV電力量", unit: "Wh" },
   { group: "現ラップデータ", key: "pib", label: "現ラップバッテリ電力量", unit: "Wh" },
@@ -88,29 +87,16 @@ app.get("/", (_req, res) => {
     font-size: 16px;
   }
 
-  .ok {
-    color: #22c55e;
-  }
-
-  .ng {
-    color: #ef4444;
-  }
+  .ok { color: #22c55e; }
+  .ng { color: #ef4444; }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-  }
-
-  .instant-grid {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 14px;
   }
 
   .group-title {
-    grid-column: 1 / -1;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -133,20 +119,31 @@ app.get("/", (_req, res) => {
     display: inline-block;
   }
 
-  .g-now::before {
-    background: #2563eb;
+  .g-now::before { background: #2563eb; }
+  .g-lap::before { background: #f59e0b; }
+  .g-prev::before { background: #7c3aed; }
+  .g-total::before { background: #16a34a; }
+
+  .group-grid {
+    display: grid;
+    gap: 14px;
+    width: 100%;
   }
 
-  .g-lap::before {
-    background: #f59e0b;
+  .instant-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .g-prev::before {
-    background: #7c3aed;
+  .lap-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .g-total::before {
-    background: #16a34a;
+  .prev-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .total-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 
   .card {
@@ -157,27 +154,10 @@ app.get("/", (_req, res) => {
     min-height: 105px;
   }
 
-  .card.now {
-    border-left: 7px solid #2563eb;
-  }
-
-  .card.lap {
-    border-left: 7px solid #f59e0b;
-  }
-
-  .card.prev {
-    border-left: 7px solid #7c3aed;
-  }
-
-  .card.total {
-    border-left: 7px solid #16a34a;
-  }
-
-  .card.important {
-    background: #172554;
-    border: 2px solid #3b82f6;
-    border-left: 9px solid #60a5fa;
-  }
+  .card.now { border-left: 7px solid #2563eb; }
+  .card.lap { border-left: 7px solid #f59e0b; }
+  .card.prev { border-left: 7px solid #7c3aed; }
+  .card.total { border-left: 7px solid #16a34a; }
 
   .label {
     font-size: 14px;
@@ -193,7 +173,7 @@ app.get("/", (_req, res) => {
   }
 
   .value {
-    font-size: 34px;
+    font-size: 38px;
     line-height: 1.1;
     font-weight: 900;
     color: #ffffff;
@@ -205,29 +185,12 @@ app.get("/", (_req, res) => {
     color: #94a3b8;
   }
 
-  .card.now .value {
-    font-size: 42px;
-  }
-
-  .card.important .value {
-    font-size: 54px;
-  }
-
-  .card.important .label {
-    font-size: 16px;
-  }
-
-  .card.important .unit {
-    font-size: 20px;
-  }
-
   @media (max-width: 900px) {
-    .instant-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .card.important .value {
-      font-size: 42px;
+    .instant-grid,
+    .lap-grid,
+    .prev-grid,
+    .total-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -240,26 +203,16 @@ app.get("/", (_req, res) => {
       font-size: 22px;
     }
 
-    .grid {
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-    }
-
-    .instant-grid {
+    .instant-grid,
+    .lap-grid,
+    .prev-grid,
+    .total-grid {
       grid-template-columns: 1fr;
       gap: 10px;
     }
 
     .value {
-      font-size: 28px;
-    }
-
-    .card.now .value {
-      font-size: 34px;
-    }
-
-    .card.important .value {
-      font-size: 40px;
+      font-size: 32px;
     }
   }
 </style>
@@ -280,27 +233,27 @@ app.get("/", (_req, res) => {
 
   function groupClass(g) {
     if (g === "瞬時データ") {
-      return { title: "g-now", card: "now" };
+      return { title: "g-now", card: "now", grid: "instant-grid" };
     }
 
     if (g === "現ラップデータ") {
-      return { title: "g-lap", card: "lap" };
+      return { title: "g-lap", card: "lap", grid: "lap-grid" };
     }
 
     if (g === "前ラップデータ") {
-      return { title: "g-prev", card: "prev" };
+      return { title: "g-prev", card: "prev", grid: "prev-grid" };
     }
 
     if (g === "トータルデータ") {
-      return { title: "g-total", card: "total" };
+      return { title: "g-total", card: "total", grid: "total-grid" };
     }
 
-    return { title: "", card: "" };
+    return { title: "", card: "", grid: "" };
   }
 
   let currentGroup = "";
   let currentCardClass = "";
-  let instantContainer = null;
+  let currentGroupContainer = null;
 
   FIELDS.forEach((f) => {
     if (f.group !== currentGroup) {
@@ -314,20 +267,13 @@ app.get("/", (_req, res) => {
 
       currentCardClass = cls.card;
 
-      if (currentGroup === "瞬時データ") {
-        instantContainer = document.createElement("div");
-        instantContainer.className = "instant-grid";
-        grid.appendChild(instantContainer);
-      }
+      currentGroupContainer = document.createElement("div");
+      currentGroupContainer.className = "group-grid " + cls.grid;
+      grid.appendChild(currentGroupContainer);
     }
 
     const card = document.createElement("div");
-
-    if (f.important) {
-      card.className = "card " + currentCardClass + " important";
-    } else {
-      card.className = "card " + currentCardClass;
-    }
+    card.className = "card " + currentCardClass;
 
     const label = document.createElement("div");
     label.className = "label";
@@ -352,12 +298,7 @@ app.get("/", (_req, res) => {
 
     card.appendChild(label);
     card.appendChild(row);
-
-    if (f.group === "瞬時データ") {
-      instantContainer.appendChild(card);
-    } else {
-      grid.appendChild(card);
-    }
+    currentGroupContainer.appendChild(card);
 
     if (!values[f.key]) {
       values[f.key] = [];
