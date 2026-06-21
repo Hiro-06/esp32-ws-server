@@ -68,8 +68,16 @@ app.get("/", (_req, res) => {
   body {
     font-family: system-ui, sans-serif;
     margin: 24px;
-    background: #fff;
+    background: #111;
+    color: #fff;
   }
+  .card {
+  background: #1e1e1e;
+  border-color: #444;
+}
+.value {
+  color: #fff;
+}
   h1 { margin-bottom: 6px; }
 
   .status {
