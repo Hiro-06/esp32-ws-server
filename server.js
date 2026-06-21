@@ -28,34 +28,38 @@ wss.on("connection", (ws) => {
    unit : 単位（空文字可）
 */
 const FIELDS = [
-  // ===== 現ラップ =====
-  { group: "現ラップ", key: "ntime", label: "現ラップタイム", unit: "" },
-  { group: "現ラップ", key: "kmph",  label: "速度",           unit: "km/h" },
-  { group: "現ラップ", key: "v",     label: "主幹電圧",       unit: "V" },
-  { group: "現ラップ", key: "im",    label: "モータ電流",     unit: "A" },
-  { group: "現ラップ", key: "ipv",   label: "PV電流",         unit: "A" },
-  { group: "現ラップ", key: "ib",    label: "バッテリ電流",   unit: "A" },
-  { group: "現ラップ", key: "pm",    label: "モータ電力",     unit: "W" },
-  { group: "現ラップ", key: "ppv",   label: "PV電力",         unit: "W" },
-  { group: "現ラップ", key: "pb",    label: "バッテリ電力",   unit: "W" },
-  { group: "現ラップ", key: "pim",   label: "現ラップモータ電力量",     unit: "Wh" },
-  { group: "現ラップ", key: "pipv",  label: "現ラップPV電力量",          unit: "Wh" },
-  { group: "現ラップ", key: "pib",   label: "現ラップバッテリ電力量",   unit: "Wh" },
 
-  // ===== 前ラップ =====
-  { group: "前ラップ", key: "otime", label: "前ラップタイム", unit: "" },
-  { group: "前ラップ", key: "pimo",  label: "前ラップモータ電力量",     unit: "Wh" },
-  { group: "前ラップ", key: "pipvo", label: "前ラップPV電力量",          unit: "Wh" },
-  { group: "前ラップ", key: "pibo",  label: "前ラップバッテリ電力量",   unit: "Wh" },
+  // ===== 瞬時データ =====
+  { group: "瞬時データ", key: "ntime", label: "現ラップタイム", unit: "" },
+  { group: "瞬時データ", key: "kmph",  label: "速度", unit: "km/h" },
+  { group: "瞬時データ", key: "v",     label: "主幹電圧", unit: "V" },
+  { group: "瞬時データ", key: "im",    label: "モータ電流", unit: "A" },
+  { group: "瞬時データ", key: "ipv",   label: "PV電流", unit: "A" },
+  { group: "瞬時データ", key: "ib",    label: "バッテリ電流", unit: "A" },
+  { group: "瞬時データ", key: "pm",    label: "モータ電力", unit: "W" },
+  { group: "瞬時データ", key: "ppv",   label: "PV電力", unit: "W" },
+  { group: "瞬時データ", key: "pb",    label: "バッテリ電力", unit: "W" },
 
-  // ===== トータル =====
-  { group: "トータル", key: "lc", label: "ラップ数", unit: "" },
-  { group: "トータル", key: "ttime", label: "トータルタイム", unit: "" },
-  { group: "トータル", key: "pimt",  label: "トータルモータ電力量",     unit: "Wh" },
-  { group: "トータル", key: "pipvt", label: "トータルPV電力量",          unit: "Wh" },
-  { group: "トータル", key: "pibt",  label: "トータルバッテリ電力量",   unit: "Wh" },
+  // ===== 現ラップデータ =====
+  { group: "現ラップデータ", key: "ntime", label: "現ラップタイム", unit: "" },
+  { group: "現ラップデータ", key: "pim",   label: "現ラップモータ電力量", unit: "Wh" },
+  { group: "現ラップデータ", key: "pipv",  label: "現ラップPV電力量", unit: "Wh" },
+  { group: "現ラップデータ", key: "pib",   label: "現ラップバッテリ電力量", unit: "Wh" },
+
+  // ===== 前ラップデータ =====
+  { group: "前ラップデータ", key: "otime", label: "前ラップタイム", unit: "" },
+  { group: "前ラップデータ", key: "pimo",  label: "前ラップモータ電力量", unit: "Wh" },
+  { group: "前ラップデータ", key: "pipvo", label: "前ラップPV電力量", unit: "Wh" },
+  { group: "前ラップデータ", key: "pibo",  label: "前ラップバッテリ電力量", unit: "Wh" },
+
+  // ===== トータルデータ =====
+  { group: "トータルデータ", key: "ttime", label: "トータルタイム", unit: "" },
+  { group: "トータルデータ", key: "pimt",  label: "トータルモータ電力量", unit: "Wh" },
+  { group: "トータルデータ", key: "pipvt", label: "トータルPV電力量", unit: "Wh" },
+  { group: "トータルデータ", key: "pibt",  label: "トータルバッテリ電力量", unit: "Wh" },
+  { group: "トータルデータ", key: "lc",    label: "ラップ数", unit: "" },
+
 ];
-
 app.get("/", (_req, res) => {
   res.type("html").send(`<!doctype html>
 <html>
@@ -120,6 +124,7 @@ app.get("/", (_req, res) => {
   .g-now::before   { background: #2563eb; }  /* 青 */
   .g-prev::before  { background: #f59e0b; }  /* オレンジ */
   .g-total::before { background: #7c3aed; }  /* 紫 */
+  .g-grand::before { background: #16a34a; }  /* 緑 */
 
   .card {
     background: #fff;
@@ -156,6 +161,7 @@ app.get("/", (_req, res) => {
   .card.now   { border-left: 6px solid #2563eb; }
   .card.prev  { border-left: 6px solid #f59e0b; }
   .card.total { border-left: 6px solid #7c3aed; }
+  .card.grand { border-left: 6px solid #16a34a; }
 </style>
 </head>
 
@@ -173,12 +179,21 @@ app.get("/", (_req, res) => {
   const values = {}; // key -> span
 
   // group名 → CSSクラス
-  function groupClass(g) {
-    if (g === "現ラップ") return { title: "g-now", card: "now" };
-    if (g === "前ラップ") return { title: "g-prev", card: "prev" };
-    if (g === "トータル") return { title: "g-total", card: "total" };
-    return { title: "", card: "" };
-  }
+function groupClass(g) {
+  if (g === "瞬時データ")
+    return { title: "g-now", card: "now" };
+
+  if (g === "現ラップデータ")
+    return { title: "g-prev", card: "prev" };
+
+  if (g === "前ラップデータ")
+    return { title: "g-total", card: "total" };
+
+  if (g === "トータルデータ")
+    return { title: "g-grand", card: "grand" };
+
+  return { title: "", card: "" };
+}
 
   // ===== 固定カード生成（グループ見出し付き） =====
   let currentGroup = "";
