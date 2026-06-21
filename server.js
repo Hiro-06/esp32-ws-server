@@ -68,7 +68,7 @@ app.get("/", (_req, res) => {
   body {
     font-family: system-ui, sans-serif;
     margin: 24px;
-    background: #fafafa;
+    background: #fff;
   }
   h1 { margin-bottom: 6px; }
 
