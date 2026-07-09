@@ -340,7 +340,7 @@ app.get("/", (_req, res) => {
     // 例：秋田  付近
   const FIXED_LAT = 39.9852;
   const FIXED_LNG = 140.0049;
-  const FIXED_ZOOM = 15;
+  const FIXED_ZOOM = 11;
 
    // 例：八幡  付近
   //const FIXED_LAT = 34.8503;
@@ -350,7 +350,7 @@ app.get("/", (_req, res) => {
    // 例：白浜  付近
   //const FIXED_LAT = 33.6649;
   //const FIXED_LNG = 135.3561;
-  //const FIXED_ZOOM = 15;
+  //const FIXED_ZOOM = 14;
 
   const map = L.map("map", {
     zoomControl: true
