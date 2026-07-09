@@ -21,14 +21,8 @@ wss.on("connection", (ws) => {
   });
 });
 
-/* ===== 表示定義 =====
-   type:
-   normal = 通常カード
-   gauge  = メータ表示
-   bar    = バー表示
-*/
+/* ===== 表示定義 ===== */
 const FIELDS = [
-  // ===== 瞬時データ =====
   { group: "瞬時データ", key: "ntime", label: "現ラップタイム", unit: "", type: "normal" },
   { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h", type: "gauge", min: 0, max: 150 },
   { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V", type: "gauge", min: 0, max: 130 },
@@ -41,18 +35,19 @@ const FIELDS = [
   { group: "瞬時データ", key: "ppv", label: "PV電力", unit: "W", type: "bar", min: 0, max: 2000 },
   { group: "瞬時データ", key: "pb", label: "バッテリ電力", unit: "W", type: "bar", min: -5000, max: 5000 },
 
-  // ===== 現ラップデータ =====
+  { group: "GPSデータ", key: "lat", label: "緯度", unit: "", type: "normal" },
+  { group: "GPSデータ", key: "lng", label: "経度", unit: "", type: "normal" },
+  { group: "GPSデータ", key: "course", label: "方位", unit: "deg", type: "normal" },
+
   { group: "現ラップデータ", key: "pim", label: "現ラップモータ電力量", unit: "Wh", type: "normal" },
   { group: "現ラップデータ", key: "pipv", label: "現ラップPV電力量", unit: "Wh", type: "normal" },
   { group: "現ラップデータ", key: "pib", label: "現ラップバッテリ電力量", unit: "Wh", type: "normal" },
 
-  // ===== 前ラップデータ =====
   { group: "前ラップデータ", key: "otime", label: "前ラップタイム", unit: "", type: "normal" },
   { group: "前ラップデータ", key: "pimo", label: "前ラップモータ電力量", unit: "Wh", type: "normal" },
   { group: "前ラップデータ", key: "pipvo", label: "前ラップPV電力量", unit: "Wh", type: "normal" },
   { group: "前ラップデータ", key: "pibo", label: "前ラップバッテリ電力量", unit: "Wh", type: "normal" },
 
-  // ===== トータルデータ =====
   { group: "トータルデータ", key: "ttime", label: "トータルタイム", unit: "", type: "normal" },
   { group: "トータルデータ", key: "pimt", label: "トータルモータ電力量", unit: "Wh", type: "normal" },
   { group: "トータルデータ", key: "pipvt", label: "トータルPV電力量", unit: "Wh", type: "normal" },
@@ -67,6 +62,8 @@ app.get("/", (_req, res) => {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OIT TEAM REGALIA 宮 ミル子</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
   * { box-sizing: border-box; }
@@ -92,6 +89,15 @@ app.get("/", (_req, res) => {
 
   .ok { color: #22c55e; }
   .ng { color: #ef4444; }
+
+  #map {
+    width: 100%;
+    height: 420px;
+    border-radius: 16px;
+    border: 1px solid #374151;
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
 
   .grid {
     display: grid;
@@ -122,6 +128,7 @@ app.get("/", (_req, res) => {
   }
 
   .g-now::before { background: #2563eb; }
+  .g-gps::before { background: #ef4444; }
   .g-lap::before { background: #f59e0b; }
   .g-prev::before { background: #7c3aed; }
   .g-total::before { background: #16a34a; }
@@ -133,6 +140,7 @@ app.get("/", (_req, res) => {
   }
 
   .instant-grid { grid-template-columns: repeat(3, 1fr); }
+  .gps-grid { grid-template-columns: repeat(3, 1fr); }
   .lap-grid { grid-template-columns: repeat(3, 1fr); }
   .prev-grid { grid-template-columns: repeat(4, 1fr); }
   .total-grid { grid-template-columns: repeat(5, 1fr); }
@@ -146,6 +154,7 @@ app.get("/", (_req, res) => {
   }
 
   .card.now { border-left: 7px solid #2563eb; }
+  .card.gps { border-left: 7px solid #ef4444; }
   .card.lap { border-left: 7px solid #f59e0b; }
   .card.prev { border-left: 7px solid #7c3aed; }
   .card.total { border-left: 7px solid #16a34a; }
@@ -176,7 +185,6 @@ app.get("/", (_req, res) => {
     color: #94a3b8;
   }
 
-  /* ===== メータ表示 ===== */
   .gauge-card {
     min-height: 220px;
   }
@@ -230,7 +238,6 @@ app.get("/", (_req, res) => {
     font-size: 42px;
   }
 
-  /* ===== バー表示 ===== */
   .bar-card {
     min-height: 130px;
   }
@@ -254,6 +261,7 @@ app.get("/", (_req, res) => {
 
   @media (max-width: 900px) {
     .instant-grid,
+    .gps-grid,
     .lap-grid,
     .prev-grid,
     .total-grid {
@@ -263,10 +271,14 @@ app.get("/", (_req, res) => {
 
   @media (max-width: 600px) {
     body { margin: 12px; }
-
     h1 { font-size: 22px; }
 
+    #map {
+      height: 320px;
+    }
+
     .instant-grid,
+    .gps-grid,
     .lap-grid,
     .prev-grid,
     .total-grid {
@@ -286,7 +298,12 @@ app.get("/", (_req, res) => {
 <body>
 <h1>OIT TEAM REGALIA 宮 ミル子</h1>
 <div id="status" class="status ng">WS: connecting…</div>
+
+<div id="map"></div>
+
 <div id="grid" class="grid"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
   const FIELDS = ${JSON.stringify(FIELDS)};
@@ -297,8 +314,30 @@ app.get("/", (_req, res) => {
   const gauges = {};
   const bars = {};
 
+  // ===== 地図設定 =====
+  // 初期位置：大阪付近
+  const map = L.map("map").setView([34.6937, 135.5023], 15);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  const marker = L.marker([34.6937, 135.5023]).addTo(map);
+  marker.bindPopup("GPS waiting...");
+
+  const routeLine = L.polyline([], {
+    color: "red",
+    weight: 4
+  }).addTo(map);
+
+  let firstGps = true;
+  let lastLat = null;
+  let lastLng = null;
+
   function groupClass(g) {
     if (g === "瞬時データ") return { title: "g-now", card: "now", grid: "instant-grid" };
+    if (g === "GPSデータ") return { title: "g-gps", card: "gps", grid: "gps-grid" };
     if (g === "現ラップデータ") return { title: "g-lap", card: "lap", grid: "lap-grid" };
     if (g === "前ラップデータ") return { title: "g-prev", card: "prev", grid: "prev-grid" };
     if (g === "トータルデータ") return { title: "g-total", card: "total", grid: "total-grid" };
@@ -458,6 +497,43 @@ app.get("/", (_req, res) => {
     b.fill.style.width = (ratio * 100) + "%";
   }
 
+  function updateMap(obj) {
+    if (obj.lat === undefined || obj.lng === undefined) return;
+
+    const lat = Number(obj.lat);
+    const lng = Number(obj.lng);
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+    if (lat === 0 && lng === 0) return;
+
+    marker.setLatLng([lat, lng]);
+
+    const speed = obj.kmph !== undefined ? obj.kmph : "—";
+    const voltage = obj.v !== undefined ? obj.v : "—";
+
+    marker.bindPopup(
+      "現在位置<br>" +
+      "緯度: " + lat.toFixed(6) + "<br>" +
+      "経度: " + lng.toFixed(6) + "<br>" +
+      "速度: " + speed + " km/h<br>" +
+      "主幹電圧: " + voltage + " V"
+    );
+
+    // 同じ位置を何度も追加しない
+    if (lastLat !== lat || lastLng !== lng) {
+      routeLine.addLatLng([lat, lng]);
+      lastLat = lat;
+      lastLng = lng;
+    }
+
+    if (firstGps) {
+      map.setView([lat, lng], 16);
+      firstGps = false;
+    } else {
+      map.panTo([lat, lng]);
+    }
+  }
+
   const wsProto = location.protocol === "https:" ? "wss" : "ws";
   const wsUrl = wsProto + "://" + location.host + "/ws";
 
@@ -494,6 +570,9 @@ app.get("/", (_req, res) => {
           updateGauge(key, obj[key]);
           updateBar(key, obj[key]);
         }
+
+        updateMap(obj);
+
       } catch (e) {
         console.log("JSON parse error:", ev.data);
       }
