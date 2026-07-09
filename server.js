@@ -102,15 +102,16 @@ app.get("/", (_req, res) => {
 
   /* ===== 地図表示 ===== */
   #map {
-    width: 100%;
-    height: 840px;
-    border-radius: 16px;
-    border: 1px solid #374151;
-    margin-bottom: 18px;
-    overflow: hidden;
-    background: #111827;
+  width: 100%;
+  height: 840px;
+  border-radius: 16px;
+  border: 1px solid #374151;
+  margin-bottom: 18px;
+  overflow: hidden;
+  background: #111827;
+}
 
-    .position-control {
+.position-control {
   background: rgba(17, 24, 39, 0.92);
   color: #ffffff;
   padding: 10px;
@@ -142,7 +143,6 @@ app.get("/", (_req, res) => {
 .position-control button:hover {
   background: #1f2937;
 }
-  }
 
   .grid {
     display: grid;
@@ -384,6 +384,10 @@ app.get("/", (_req, res) => {
   //const FIXED_LAT = 33.6649;
   //const FIXED_LNG = 135.3561;
   //const FIXED_ZOOM = 14;
+
+  let FIXED_LAT = 39.9852;
+let FIXED_LNG = 140.0049;
+let FIXED_ZOOM = 13;
 
   const map = L.map("map", {
     zoomControl: true
