@@ -340,7 +340,7 @@ app.get("/", (_req, res) => {
     // 例：秋田  付近
   const FIXED_LAT = 39.9852;
   const FIXED_LNG = 140.0049;
-  const FIXED_ZOOM = 12;
+  const FIXED_ZOOM = 13;
 
    // 例：八幡  付近
   //const FIXED_LAT = 34.8503;
@@ -356,10 +356,13 @@ app.get("/", (_req, res) => {
     zoomControl: true
   }).setView([FIXED_LAT, FIXED_LNG], FIXED_ZOOM);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
     maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
+    attribution: "&copy; Esri"
+  }
+).addTo(map);
 
   // GPS受信前は固定中心位置にピンを置く
   const marker = L.marker([FIXED_LAT, FIXED_LNG]).addTo(map);
