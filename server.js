@@ -110,9 +110,7 @@ app.get("/", (_req, res) => {
     overflow: hidden;
     background: #111827;
   }
-  **Part2/5** です。Part1の続きから貼り付けてください。
 
-```js
   .grid {
     display: grid;
     grid-template-columns: 1fr;
