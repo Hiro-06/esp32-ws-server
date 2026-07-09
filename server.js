@@ -432,9 +432,10 @@ L.control.layers(baseMaps, null, {
 // ===== 表示位置・縮尺切り替えボタン =====
 const mapPositions = {
   "秋田": { lat: 39.9852, lng: 140.0049, zoom: 13 },
-  "八幡": { lat: 34.8503, lng: 135.7103, zoom: 18 },
-  "白浜": { lat: 33.6649, lng: 135.3561, zoom: 14 },
-  "大阪": { lat: 34.6937, lng: 135.5023, zoom: 15 }
+  "八幡": { lat: 34.8503, lng: 135.7103, zoom: 19 },
+  "白浜": { lat: 33.6649, lng: 135.3561, zoom: 15 },
+  "大宮": { lat: 34.7309, lng: 135.5447, zoom: 19 },
+  "枚方": { lat: 34.8407, lng: 135.7055, zoom: 19 }
 };
 
 const positionControl = L.control({ position: "topright" });
@@ -447,7 +448,8 @@ positionControl.onAdd = function () {
     <button type="button" data-place="秋田">秋田</button>
     <button type="button" data-place="八幡">八幡</button>
     <button type="button" data-place="白浜">白浜</button>
-    <button type="button" data-place="大阪">大阪</button>
+    <button type="button" data-place="大宮">大宮</button>
+    <button type="button" data-place="枚方">枚方</button>
   \`;
 
   L.DomEvent.disableClickPropagation(div);
