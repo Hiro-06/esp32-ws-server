@@ -21,8 +21,14 @@ wss.on("connection", (ws) => {
   });
 });
 
-/* ===== 表示定義 ===== */
+/* ===== 表示定義 =====
+   type:
+   normal = 通常カード
+   gauge  = メータ表示
+   bar    = バー表示
+*/
 const FIELDS = [
+  // ===== 瞬時データ =====
   { group: "瞬時データ", key: "ntime", label: "現ラップタイム", unit: "", type: "normal" },
   { group: "瞬時データ", key: "kmph", label: "速度", unit: "km/h", type: "gauge", min: 0, max: 150 },
   { group: "瞬時データ", key: "v", label: "主幹電圧", unit: "V", type: "gauge", min: 0, max: 130 },
@@ -35,19 +41,23 @@ const FIELDS = [
   { group: "瞬時データ", key: "ppv", label: "PV電力", unit: "W", type: "bar", min: 0, max: 2000 },
   { group: "瞬時データ", key: "pb", label: "バッテリ電力", unit: "W", type: "bar", min: -5000, max: 5000 },
 
+  // ===== GPSデータ =====
   { group: "GPSデータ", key: "lat", label: "緯度", unit: "", type: "normal" },
   { group: "GPSデータ", key: "lng", label: "経度", unit: "", type: "normal" },
   { group: "GPSデータ", key: "course", label: "方位", unit: "deg", type: "normal" },
 
+  // ===== 現ラップデータ =====
   { group: "現ラップデータ", key: "pim", label: "現ラップモータ電力量", unit: "Wh", type: "normal" },
   { group: "現ラップデータ", key: "pipv", label: "現ラップPV電力量", unit: "Wh", type: "normal" },
   { group: "現ラップデータ", key: "pib", label: "現ラップバッテリ電力量", unit: "Wh", type: "normal" },
 
+  // ===== 前ラップデータ =====
   { group: "前ラップデータ", key: "otime", label: "前ラップタイム", unit: "", type: "normal" },
   { group: "前ラップデータ", key: "pimo", label: "前ラップモータ電力量", unit: "Wh", type: "normal" },
   { group: "前ラップデータ", key: "pipvo", label: "前ラップPV電力量", unit: "Wh", type: "normal" },
   { group: "前ラップデータ", key: "pibo", label: "前ラップバッテリ電力量", unit: "Wh", type: "normal" },
 
+  // ===== トータルデータ =====
   { group: "トータルデータ", key: "ttime", label: "トータルタイム", unit: "", type: "normal" },
   { group: "トータルデータ", key: "pimt", label: "トータルモータ電力量", unit: "Wh", type: "normal" },
   { group: "トータルデータ", key: "pipvt", label: "トータルPV電力量", unit: "Wh", type: "normal" },
@@ -90,15 +100,19 @@ app.get("/", (_req, res) => {
   .ok { color: #22c55e; }
   .ng { color: #ef4444; }
 
+  /* ===== 地図表示 ===== */
   #map {
     width: 100%;
-    height: 420px;
+    height: 840px;
     border-radius: 16px;
     border: 1px solid #374151;
     margin-bottom: 18px;
     overflow: hidden;
+    background: #111827;
   }
+  **Part2/5** です。Part1の続きから貼り付けてください。
 
+```js
   .grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -185,6 +199,7 @@ app.get("/", (_req, res) => {
     color: #94a3b8;
   }
 
+  /* ===== メータ表示 ===== */
   .gauge-card {
     min-height: 220px;
   }
@@ -238,6 +253,7 @@ app.get("/", (_req, res) => {
     font-size: 42px;
   }
 
+  /* ===== バー表示 ===== */
   .bar-card {
     min-height: 130px;
   }
@@ -258,8 +274,7 @@ app.get("/", (_req, res) => {
     border-radius: 999px;
     transition: width 0.2s ease-out;
   }
-
-  @media (max-width: 900px) {
+　  @media (max-width: 900px) {
     .instant-grid,
     .gps-grid,
     .lap-grid,
@@ -271,6 +286,7 @@ app.get("/", (_req, res) => {
 
   @media (max-width: 600px) {
     body { margin: 12px; }
+
     h1 { font-size: 22px; }
 
     #map {
@@ -315,23 +331,33 @@ app.get("/", (_req, res) => {
   const bars = {};
 
   // ===== 地図設定 =====
-  // 初期位置：大阪付近
-  const map = L.map("map").setView([34.6937, 135.5023], 15);
+  // 表示位置と縮尺はここで固定されます。
+  // 必要に応じて、FIXED_LAT / FIXED_LNG / FIXED_ZOOM を変更してください。
+  //
+  // 例：大阪付近
+  const FIXED_LAT = 34.6937;
+  const FIXED_LNG = 135.5023;
+  const FIXED_ZOOM = 15;
+
+  const map = L.map("map", {
+    zoomControl: true
+  }).setView([FIXED_LAT, FIXED_LNG], FIXED_ZOOM);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap contributors"
   }).addTo(map);
 
-  const marker = L.marker([34.6937, 135.5023]).addTo(map);
+  // GPS受信前は固定中心位置にピンを置く
+  const marker = L.marker([FIXED_LAT, FIXED_LNG]).addTo(map);
   marker.bindPopup("GPS waiting...");
 
+  // 走行軌跡
   const routeLine = L.polyline([], {
     color: "red",
     weight: 4
   }).addTo(map);
 
-  let firstGps = true;
   let lastLat = null;
   let lastLng = null;
 
@@ -375,8 +401,7 @@ app.get("/", (_req, res) => {
 
     return { card, val };
   }
-
-  function createGaugeCard(f, cardClass) {
+　　  function createGaugeCard(f, cardClass) {
     const card = document.createElement("div");
     card.className = "card " + cardClass + " gauge-card";
 
@@ -496,8 +521,7 @@ app.get("/", (_req, res) => {
 
     b.fill.style.width = (ratio * 100) + "%";
   }
-
-  function updateMap(obj) {
+    function updateMap(obj) {
     if (obj.lat === undefined || obj.lng === undefined) return;
 
     const lat = Number(obj.lat);
@@ -506,32 +530,31 @@ app.get("/", (_req, res) => {
     if (Number.isNaN(lat) || Number.isNaN(lng)) return;
     if (lat === 0 && lng === 0) return;
 
+    // ピンのみ移動
     marker.setLatLng([lat, lng]);
 
     const speed = obj.kmph !== undefined ? obj.kmph : "—";
     const voltage = obj.v !== undefined ? obj.v : "—";
+    const course = obj.course !== undefined ? obj.course : "—";
 
     marker.bindPopup(
       "現在位置<br>" +
       "緯度: " + lat.toFixed(6) + "<br>" +
       "経度: " + lng.toFixed(6) + "<br>" +
       "速度: " + speed + " km/h<br>" +
-      "主幹電圧: " + voltage + " V"
+      "主幹電圧: " + voltage + " V<br>" +
+      "方位: " + course + " deg"
     );
 
-    // 同じ位置を何度も追加しない
+    // 走行軌跡を追加
     if (lastLat !== lat || lastLng !== lng) {
       routeLine.addLatLng([lat, lng]);
       lastLat = lat;
       lastLng = lng;
     }
 
-    if (firstGps) {
-      map.setView([lat, lng], 16);
-      firstGps = false;
-    } else {
-      map.panTo([lat, lng]);
-    }
+    // 地図の表示位置と縮尺は固定するため、
+    // map.setView() や map.panTo() は使用しません。
   }
 
   const wsProto = location.protocol === "https:" ? "wss" : "ws";
