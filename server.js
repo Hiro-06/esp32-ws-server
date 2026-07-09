@@ -101,7 +101,7 @@ app.get("/", (_req, res) => {
   .ng { color: #ef4444; }
 
   /* ===== 地図表示 ===== */
-  #map {
+ #map {
   width: 100%;
   height: 840px;
   border-radius: 16px;
@@ -386,8 +386,8 @@ app.get("/", (_req, res) => {
   //const FIXED_ZOOM = 14;
 
   let FIXED_LAT = 39.9852;
-let FIXED_LNG = 140.0049;
-let FIXED_ZOOM = 13;
+　let FIXED_LNG = 140.0049;
+　let FIXED_ZOOM = 13;
 
   const map = L.map("map", {
     zoomControl: true
@@ -442,13 +442,13 @@ const positionControl = L.control({ position: "topright" });
 positionControl.onAdd = function () {
   const div = L.DomUtil.create("div", "position-control");
 
-  div.innerHTML = `
+  div.innerHTML = \`
     <div class="position-title">表示位置</div>
     <button type="button" data-place="秋田">秋田</button>
     <button type="button" data-place="八幡">八幡</button>
     <button type="button" data-place="白浜">白浜</button>
     <button type="button" data-place="大阪">大阪</button>
-  `;
+  \`;
 
   L.DomEvent.disableClickPropagation(div);
   L.DomEvent.disableScrollPropagation(div);
