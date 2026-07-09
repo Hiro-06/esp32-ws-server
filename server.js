@@ -356,13 +356,31 @@ app.get("/", (_req, res) => {
     zoomControl: true
   }).setView([FIXED_LAT, FIXED_LNG], FIXED_ZOOM);
 
-L.tileLayer(
+const normalMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: "&copy; OpenStreetMap contributors"
+});
+
+const satelliteMap = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   {
     maxZoom: 19,
     attribution: "&copy; Esri"
   }
-).addTo(map);
+);
+
+// 初期表示は通常地図
+normalMap.addTo(map);
+
+// 右上に切り替えボタンを表示
+const baseMaps = {
+  "通常地図": normalMap,
+  "衛星画像": satelliteMap
+};
+
+L.control.layers(baseMaps, null, {
+  collapsed: false
+}).addTo(map);
 
   // GPS受信前は固定中心位置にピンを置く
   const marker = L.marker([FIXED_LAT, FIXED_LNG]).addTo(map);
