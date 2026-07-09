@@ -340,7 +340,7 @@ app.get("/", (_req, res) => {
     // 例：秋田  付近
   const FIXED_LAT = 39.9852;
   const FIXED_LNG = 140.0049;
-  const FIXED_ZOOM = 11;
+  const FIXED_ZOOM = 12;
 
    // 例：八幡  付近
   //const FIXED_LAT = 34.8503;
