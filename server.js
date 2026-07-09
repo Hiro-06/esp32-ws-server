@@ -433,7 +433,7 @@ L.control.layers(baseMaps, null, {
 const mapPositions = {
   "秋田": { lat: 39.9852, lng: 140.0049, zoom: 13 },
   "八幡": { lat: 34.8503, lng: 135.7103, zoom: 19 },
-  "白浜": { lat: 33.6649, lng: 135.3561, zoom: 15 },
+  "白浜": { lat: 33.6649, lng: 135.3561, zoom: 16 },
   "大宮": { lat: 34.7309, lng: 135.5447, zoom: 19 },
   "枚方": { lat: 34.8407, lng: 135.7055, zoom: 19 }
 };
