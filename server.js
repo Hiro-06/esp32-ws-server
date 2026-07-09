@@ -331,11 +331,26 @@ app.get("/", (_req, res) => {
   // ===== 地図設定 =====
   // 表示位置と縮尺はここで固定されます。
   // 必要に応じて、FIXED_LAT / FIXED_LNG / FIXED_ZOOM を変更してください。
-  //
+  //下記は表示条件に合わせて変更
   // 例：大阪付近
-  const FIXED_LAT = 34.6937;
-  const FIXED_LNG = 135.5023;
-  const FIXED_ZOOM = 15;
+  //const FIXED_LAT = 34.6937;
+  //const FIXED_LNG = 135.5023;
+  //const FIXED_ZOOM = 15;
+
+    // 例：秋田  付近
+  //const FIXED_LAT = 39.9852;
+  //const FIXED_LNG = 140.0049;
+  //const FIXED_ZOOM = 10;
+
+   // 例：八幡  付近
+  const FIXED_LAT = 34.8503;
+  const FIXED_LNG = 135.7103;
+  const FIXED_ZOOM = 20;
+
+   // 例：白浜  付近
+  //const FIXED_LAT = 33.6649;
+  //const FIXED_LNG = 135.3561;
+  //const FIXED_ZOOM = 12;
 
   const map = L.map("map", {
     zoomControl: true
