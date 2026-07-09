@@ -109,6 +109,39 @@ app.get("/", (_req, res) => {
     margin-bottom: 18px;
     overflow: hidden;
     background: #111827;
+
+    .position-control {
+  background: rgba(17, 24, 39, 0.92);
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #374151;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.position-title {
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.position-control button {
+  display: block;
+  width: 80px;
+  margin: 4px 0;
+  padding: 6px 8px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.position-control button:hover {
+  background: #1f2937;
+}
   }
 
   .grid {
@@ -338,9 +371,9 @@ app.get("/", (_req, res) => {
   //const FIXED_ZOOM = 15;
 
     // 例：秋田  付近
-  const FIXED_LAT = 39.9852;
-  const FIXED_LNG = 140.0049;
-  const FIXED_ZOOM = 13;
+  //const FIXED_LAT = 39.9852;
+  //const FIXED_LNG = 140.0049;
+  //const FIXED_ZOOM = 13;
 
    // 例：八幡  付近
   //const FIXED_LAT = 34.8503;
@@ -391,6 +424,49 @@ L.control.layers(baseMaps, null, {
     color: "red",
     weight: 4
   }).addTo(map);
+
+// ===== 表示位置・縮尺切り替えボタン =====
+const mapPositions = {
+  "秋田": { lat: 39.9852, lng: 140.0049, zoom: 13 },
+  "八幡": { lat: 34.8503, lng: 135.7103, zoom: 18 },
+  "白浜": { lat: 33.6649, lng: 135.3561, zoom: 14 },
+  "大阪": { lat: 34.6937, lng: 135.5023, zoom: 15 }
+};
+
+const positionControl = L.control({ position: "topright" });
+
+positionControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "position-control");
+
+  div.innerHTML = `
+    <div class="position-title">表示位置</div>
+    <button type="button" data-place="秋田">秋田</button>
+    <button type="button" data-place="八幡">八幡</button>
+    <button type="button" data-place="白浜">白浜</button>
+    <button type="button" data-place="大阪">大阪</button>
+  `;
+
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  div.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const place = btn.dataset.place;
+      const p = mapPositions[place];
+      if (!p) return;
+
+      FIXED_LAT = p.lat;
+      FIXED_LNG = p.lng;
+      FIXED_ZOOM = p.zoom;
+
+      map.setView([FIXED_LAT, FIXED_LNG], FIXED_ZOOM);
+    });
+  });
+
+  return div;
+};
+
+positionControl.addTo(map);
 
   let lastLat = null;
   let lastLng = null;
