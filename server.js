@@ -663,10 +663,10 @@ positionControl.addTo(map);
     );
 
     // 走行軌跡を追加
-  //  if (lastLat !== lat || lastLng !== lng) {
-  //    routeLine.addLatLng([lat, lng]);
-  //    lastLat = lat;
-  //    lastLng = lng;
+    if (lastLat !== lat || lastLng !== lng) {
+      routeLine.addLatLng([lat, lng]);
+      lastLat = lat;
+      lastLng = lng;
     }
 
     // 地図の表示位置と縮尺は固定するため、
