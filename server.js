@@ -424,10 +424,10 @@ L.control.layers(baseMaps, null, {
   marker.bindPopup("GPS waiting...");
 
   // 走行軌跡
-  const routeLine = L.polyline([], {
-    color: "red",
-    weight: 4
-  }).addTo(map);
+  //const routeLine = L.polyline([], {
+    //color: "red",
+    //weight: 4
+  //}).addTo(map);
 
 // ===== 表示位置・縮尺切り替えボタン =====
 const mapPositions = {
@@ -663,11 +663,14 @@ positionControl.addTo(map);
     );
 
     // 走行軌跡を追加
-    if (lastLat !== lat || lastLng !== lng) {
-      routeLine.addLatLng([lat, lng]);
+   // if (lastLat !== lat || lastLng !== lng) {
+   //   routeLine.addLatLng([lat, lng]);
+   //   lastLat = lat;
+   //   lastLng = lng;
+   // }
+
       lastLat = lat;
       lastLng = lng;
-    }
 
     // 地図の表示位置と縮尺は固定するため、
     // map.setView() や map.panTo() は使用しません。
